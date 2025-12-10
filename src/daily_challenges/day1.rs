@@ -5,7 +5,6 @@ use std::{
 
 // https://adventofcode.com/2025/day/1
 pub fn day1(input_reader: BufReader<File>) {
-
     // part 1: get true password
     let mut current_score = 50;
     let mut final_password = 0;
@@ -31,7 +30,7 @@ pub fn day1(input_reader: BufReader<File>) {
                             final_password_pt2 += 1;
                         }
                     } else if line.contains("L") {
-                        let mut started_in_zero  = false;
+                        let mut started_in_zero = false;
                         if current_score == 0 {
                             started_in_zero = true;
                         }
@@ -53,7 +52,10 @@ pub fn day1(input_reader: BufReader<File>) {
                 }
             }
             //println!("<{}> Current score: {}", line, current_score);
-            println!("<{}> Current score and pass (pt2): {} - {}", line, current_score, final_password_pt2);
+            println!(
+                "<{}> Current score and pass (pt2): {} - {}",
+                line, current_score, final_password_pt2
+            );
             // part 1 solution
             if current_score == 0 {
                 final_password += 1;
@@ -62,8 +64,8 @@ pub fn day1(input_reader: BufReader<File>) {
     }
 
     println!("Part 1: The final password is: {}", final_password);
-    println!("Part 2: The final with any click password is: {}", final_password_pt2);
-
-
+    println!(
+        "Part 2: The final with any click password is: {}",
+        final_password_pt2
+    );
 }
-

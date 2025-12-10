@@ -6,6 +6,7 @@ mod daily_challenges;
 
 pub enum Challenge {
     Day1,
+    Day2,
 }
 
 fn main() {
@@ -15,10 +16,11 @@ fn main() {
     let ex_result = match ex {
         Some(day) => match day.as_str() {
             "1" => day_picker(Challenge::Day1, day),
+            "2" => day_picker(Challenge::Day2, day),
             _ => {
                 println!("Invalid day!!!: {}", day);
                 Ok(())
-            },
+            }
         },
         None => {
             println!("Please enter the challenge day number in console.");
