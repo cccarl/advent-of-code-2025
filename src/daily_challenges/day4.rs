@@ -54,10 +54,10 @@ pub fn day4(input_reader: BufReader<File>) {
                         if let Some(field_row_found) = prox_row_checking {
                             let spot_checking = field_row_found
                                 .get::<usize>(current_index_spot.try_into().unwrap());
-                            if let Some(spot_found) = spot_checking {
-                                if *spot_found {
-                                    paper_amount_in_proximity += 1;
-                                }
+                            if let Some(spot_found) = spot_checking
+                                && *spot_found
+                            {
+                                paper_amount_in_proximity += 1;
                             }
                         }
                     }
@@ -73,7 +73,7 @@ pub fn day4(input_reader: BufReader<File>) {
                 }
             }
         }
-        if paper_to_remove.len() == 0 {
+        if paper_to_remove.is_empty() {
             println!("No accessible paper was found! Ending...\n");
             break;
         }

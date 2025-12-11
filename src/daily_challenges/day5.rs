@@ -59,7 +59,7 @@ pub fn day5(input_reader: BufReader<File>) {
                                 // range is bigger than other one, include directly, prev case removes the smaller one
                                 else if range_to_check.0 <= range_from_total.0 &&  range_from_total.1 <= range_to_check.1 {
                                     value_has_no_overlap = false;
-                                    range_to_check.clone()
+                                    *range_to_check
                                 }
                                 // range start is included in another range, expand and save
                                 else if range_from_total.0 <= range_to_check.0 && range_to_check.0 <= range_from_total.1 {
@@ -86,7 +86,7 @@ pub fn day5(input_reader: BufReader<File>) {
                             
                             if value_has_no_overlap {
                                 //println!("Adding, no overlaps: {:?}", range_to_check);
-                                fixed_overlaps_vec.push(range_to_check.clone());
+                                fixed_overlaps_vec.push(*range_to_check);
                             }
 
                             //println!("Fixed progress: {:?}", fixed_overlaps_vec);

@@ -78,14 +78,18 @@ pub fn day3(input_reader: BufReader<File>) {
         ];
         let total_loops = indexes_with_highest_nums.len();
         let mut highest_index: i32 = -1;
-        for i in 0..total_loops {
+        for (i, index_in_vec) in indexes_with_highest_nums
+            .iter_mut()
+            .enumerate()
+            .take(total_loops)
+        {
             //println!("Digit {} is checking: {}", i, line.get(0..(line.len() - (total_loops - i - 1))).unwrap());
 
             for (index, char) in line.chars().enumerate() {
                 let curr_num: i32 = char.to_string().parse().expect("Could not parse number");
-                let highest_num: i32 = match indexes_with_highest_nums[i] {
+                let highest_num: i32 = match index_in_vec {
                     Some(index) => line
-                        .get(index..index + 1)
+                        .get(*index..*index + 1)
                         .expect("Could not get line index")
                         .parse()
                         .expect("Could not parse to i32"),
@@ -96,7 +100,7 @@ pub fn day3(input_reader: BufReader<File>) {
                     && index < line.len() - (total_loops - i - 1)
                     && (index as i32) > highest_index
                 {
-                    indexes_with_highest_nums[i] = Some(index);
+                    *index_in_vec = Some(index);
                     highest_index = index.try_into().unwrap();
                     //println!("[Digit {}]Compared: {} vs {}, saving: {} at index {}", i, curr_num, highest_num, curr_num, index );
                     continue;
