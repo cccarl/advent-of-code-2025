@@ -7,7 +7,7 @@ enum CurrentSection {
     Values,
 }
 
-// https://adventofcode.com/2025/day/3
+// https://adventofcode.com/2025/day/5
 pub fn day5(input_reader: BufReader<File>) {
     let mut section = CurrentSection::Ranges;
     let mut ranges: Vec<(u64, u64)> = vec![];
