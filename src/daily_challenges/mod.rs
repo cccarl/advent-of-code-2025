@@ -1,6 +1,7 @@
 mod day1;
 mod day2;
 mod day3;
+mod day4;
 
 use std::fs::File;
 use std::io;
@@ -10,6 +11,7 @@ use crate::Challenge;
 use day1::day1;
 use day2::day2;
 use day3::day3;
+use day4::day4;
 
 const INPUTS_FOLDER: &str = "inputs";
 
@@ -21,6 +23,7 @@ pub fn day_picker(chall: Challenge, day_str: String) -> io::Result<()> {
         Challenge::Day1 => day1(reader),
         Challenge::Day2 => day2(reader),
         Challenge::Day3 => day3(reader),
+        Challenge::Day4 => day4(reader),
     };
 
     Ok(())
