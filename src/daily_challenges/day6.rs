@@ -53,8 +53,8 @@ pub fn day6(input_reader: &mut BufReader<File>) {
     for i in 0..operation_data[0].len() {
         let mut curr_op_nums: Vec<u64> = vec![];
         let operation = &operation_types[i];
-        for j in 0..operation_data.len() {
-            curr_op_nums.push(operation_data[j][i]);
+        for ops in &operation_data {
+            curr_op_nums.push(ops[i]);
         }
         let result = match operation {
             OpType::Add => curr_op_nums.iter().sum::<u64>(),
@@ -115,10 +115,10 @@ pub fn day6(input_reader: &mut BufReader<File>) {
             for line in &number_lines_chars {
                 let char = line.get(numbers_start_idx + offset);
 
-                if let Some(c) = char {
-                    if *c != ' ' {
-                        potential_number_built.push(*c);
-                    }
+                if let Some(c) = char
+                    && *c != ' '
+                {
+                    potential_number_built.push(*c);
                 }
             }
 
