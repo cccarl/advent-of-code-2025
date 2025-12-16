@@ -12,6 +12,7 @@ pub enum Challenge {
     Day5,
     Day6,
     Day7,
+    Day8,
 }
 
 fn main() {
@@ -27,6 +28,7 @@ fn main() {
             "5" => day_picker(Challenge::Day5, day),
             "6" => day_picker(Challenge::Day6, day),
             "7" => day_picker(Challenge::Day7, day),
+            "8" => day_picker(Challenge::Day8, day),
             _ => {
                 println!("Invalid day!!!: {}", day);
                 Ok(())
