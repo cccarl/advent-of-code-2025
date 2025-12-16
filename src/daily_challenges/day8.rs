@@ -4,7 +4,7 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-// https://adventofcode.com/2025/day/7
+// https://adventofcode.com/2025/day/8
 pub fn day8(input_reader: BufReader<File>) {
     let mut nodes: Vec<(i64, i64, i64)> = vec![];
     for line_res in input_reader.lines() {
@@ -32,7 +32,7 @@ pub fn day8(input_reader: BufReader<File>) {
     let mut all_connections_made: HashSet<Vec<usize>> = HashSet::new();
     let mut connection_count = 0;
     while connection_count < 10 {
-        println!("");
+        println!();
         let mut shortest_distance: Option<f64> = None;
         let mut node_indexes_shortest: (usize, usize) = (0, 0);
         for (i, checking_node) in nodes.iter().enumerate() {
