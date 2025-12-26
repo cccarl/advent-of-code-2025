@@ -31,8 +31,8 @@ pub fn day8(input_reader: BufReader<File>) {
     let mut circuits: Vec<Vec<usize>> = vec![];
     let mut all_connections_made: HashSet<Vec<usize>> = HashSet::new();
     let mut connection_count = 0;
-    while connection_count < 10 {
-        println!();
+    while connection_count < 999 {
+        println!("Curr count: {}", connection_count);
         let mut shortest_distance: Option<f64> = None;
         let mut node_indexes_shortest: (usize, usize) = (0, 0);
         for (i, checking_node) in nodes.iter().enumerate() {
@@ -44,7 +44,7 @@ pub fn day8(input_reader: BufReader<File>) {
                 let mut already_added = false;
                 for conn in &all_connections_made {
                     if conn.contains(&i) && conn.contains(&j) {
-                        println!("Skipping: {}-{} in {:?}", i, j, conn);
+                        //println!("Skipping: {}-{} in {:?}", i, j, conn);
                         already_added = true;
                         break;
                     }
@@ -60,7 +60,7 @@ pub fn day8(input_reader: BufReader<File>) {
                     .sqrt();
 
                 if shortest_distance.is_none() || shortest_distance.unwrap() > distance {
-                    println!("New shortest distance: {} {}", i, j);
+                    //println!("New shortest distance: {} {} -> {}", i, j, distance);
                     shortest_distance = Some(distance);
                     node_indexes_shortest = (i, j);
                 }
@@ -68,20 +68,28 @@ pub fn day8(input_reader: BufReader<File>) {
         }
 
         let mut added = false;
-        for circ in &mut circuits {
+        let mut circs_idx_to_remove: Vec<usize> = vec![];
+        let mut values_to_add: HashSet<usize> = HashSet::new();
+        for (circ_idx, circ) in circuits.iter().enumerate() {
             if circ.contains(&node_indexes_shortest.0) && !circ.contains(&node_indexes_shortest.1) {
                 println!("Adding: {} -> {:?}", node_indexes_shortest.1, circ);
                 all_connections_made.insert(vec![node_indexes_shortest.0, node_indexes_shortest.1]);
-                circ.push(node_indexes_shortest.1);
-                connection_count += 1;
+                for val in circ {
+                    values_to_add.insert(*val);
+                }
+                values_to_add.insert(node_indexes_shortest.1);
+                circs_idx_to_remove.push(circ_idx);
                 added = true;
             } else if circ.contains(&node_indexes_shortest.1)
                 && !circ.contains(&node_indexes_shortest.0)
             {
                 println!("Adding: {} -> {:?}", node_indexes_shortest.0, circ);
                 all_connections_made.insert(vec![node_indexes_shortest.0, node_indexes_shortest.1]);
-                circ.push(node_indexes_shortest.0);
-                connection_count += 1;
+                for val in circ {
+                    values_to_add.insert(*val);
+                }
+                values_to_add.insert(node_indexes_shortest.0);
+                circs_idx_to_remove.push(circ_idx);
                 added = true;
             } else if circ.contains(&node_indexes_shortest.1)
                 && circ.contains(&node_indexes_shortest.0)
@@ -95,6 +103,7 @@ pub fn day8(input_reader: BufReader<File>) {
             }
         }
 
+        // add to a new circuit
         if !added {
             println!(
                 "Adding: ({}, {}) -> {:?}",
@@ -103,9 +112,32 @@ pub fn day8(input_reader: BufReader<File>) {
             all_connections_made.insert(vec![node_indexes_shortest.0, node_indexes_shortest.1]);
             circuits.push(vec![node_indexes_shortest.0, node_indexes_shortest.1]);
             connection_count += 1;
+        } else if !values_to_add.is_empty() {
+            // rebuild circuit in case 2 of them connect
+            connection_count += 1;
+
+            // assuming they are in order...
+            let mut removed_amount = 0;
+            for idx_to_remove in circs_idx_to_remove {
+                circuits.remove(idx_to_remove - removed_amount);
+                removed_amount += 1;
+            }
+
+            let mut new_circuit = vec![];
+            for val in values_to_add {
+                new_circuit.push(val);
+            }
+            circuits.push(new_circuit);
         }
         println!("Current Circuits: {:?}", circuits);
     }
 
     println!("\nFinal: {:?}", circuits);
+
+    let mut final_mult = 1;
+    for i in 1..=3 {
+        final_mult *= circuits.get(circuits.len() - i).unwrap().len();
+    }
+
+    println!("Final mult: {}", final_mult);
 }
