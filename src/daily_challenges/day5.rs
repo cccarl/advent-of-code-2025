@@ -1,5 +1,7 @@
 use std::{
-    collections::HashSet, fs::File, io::{BufRead, BufReader}
+    collections::HashSet,
+    fs::File,
+    io::{BufRead, BufReader},
 };
 
 enum CurrentSection {
@@ -44,30 +46,36 @@ pub fn day5(input_reader: BufReader<File>) {
                             //println!("\nCHECKING: {:?}", range_to_check);
                             let mut value_has_no_overlap = true;
                             for range_from_total in &initial_vec {
-
                                 // don't check yourself!
                                 if range_to_check == range_from_total {
                                     continue;
                                 }
 
-                                let fixed_range = 
                                 // range is overlapped by other one, don't include in new vec
-                                if range_from_total.0 <= range_to_check.0 && range_to_check.1 <= range_from_total.1 {
+                                let fixed_range = if range_from_total.0 <= range_to_check.0
+                                    && range_to_check.1 <= range_from_total.1
+                                {
                                     value_has_no_overlap = false;
                                     break;
-                                } 
+                                }
                                 // range is bigger than other one, include directly, prev case removes the smaller one
-                                else if range_to_check.0 <= range_from_total.0 &&  range_from_total.1 <= range_to_check.1 {
+                                else if range_to_check.0 <= range_from_total.0
+                                    && range_from_total.1 <= range_to_check.1
+                                {
                                     value_has_no_overlap = false;
                                     *range_to_check
                                 }
                                 // range start is included in another range, expand and save
-                                else if range_from_total.0 <= range_to_check.0 && range_to_check.0 <= range_from_total.1 {
+                                else if range_from_total.0 <= range_to_check.0
+                                    && range_to_check.0 <= range_from_total.1
+                                {
                                     value_has_no_overlap = false;
                                     (range_from_total.0, range_to_check.1)
                                 }
                                 // range end is included in another range, expand and save
-                                else if range_from_total.0 <= range_to_check.1 && range_to_check.1 <= range_from_total.1 {
+                                else if range_from_total.0 <= range_to_check.1
+                                    && range_to_check.1 <= range_from_total.1
+                                {
                                     value_has_no_overlap = false;
                                     (range_to_check.0, range_from_total.1)
                                 }
@@ -76,21 +84,22 @@ pub fn day5(input_reader: BufReader<File>) {
                                     continue;
                                 };
 
-                                println!("Overlap detected: {:?} {:?}", range_from_total, range_to_check);
+                                println!(
+                                    "Overlap detected: {:?} {:?}",
+                                    range_from_total, range_to_check
+                                );
                                 println!("Adding fixed version: {:?}", fixed_range);
                                 is_fixed = false;
                                 fixed_overlaps_vec.push(fixed_range);
                                 break;
                             }
-                            
-                            
+
                             if value_has_no_overlap {
                                 //println!("Adding, no overlaps: {:?}", range_to_check);
                                 fixed_overlaps_vec.push(*range_to_check);
                             }
 
                             //println!("Fixed progress: {:?}", fixed_overlaps_vec);
-                            
                         }
 
                         if is_fixed {
@@ -102,7 +111,7 @@ pub fn day5(input_reader: BufReader<File>) {
                         }
                     }
                     //println!("Final ranges: {:?}", fixed_overlaps_vec);
-                    
+
                     for range in fixed_overlaps_vec {
                         all_ranges_no_dupes.insert(range);
                     }
