@@ -72,123 +72,156 @@ pub fn day8(input_reader: BufReader<File>) {
     let tree = build_kd_tree(nodes_vec.clone(), 0);
     //dbg!("THE TREE:", &tree);
 
+    let mut full_circuit = false;
+    let mut shortest_pairs_amount = 10000; // ok this worked with a random ass number LOL, the while wasn't needed
     let mut circuits: Vec<Vec<usize>> = vec![];
-    let mut all_connections_made: HashSet<[(i64, i64, i64, usize); 2]> = HashSet::new();
-    let mut shortest_pairs = BinaryHeap::new();
-    let shortest_pairs_amount = 1001;
-    //println!("Curr count: {}", connection_count);
-    for (i, checking_node) in nodes_vec.iter().enumerate() {
-        find_shortest_distances(
-            &tree.clone(),
-            (checking_node.0, checking_node.1, checking_node.2),
-            i,
-            &mut shortest_pairs,
-            shortest_pairs_amount,
-        );
-    }
 
-    let shortest_connections = shortest_pairs.clone().into_sorted_vec();
-    println!();
-    println!("SHORTESTs: {:?}", shortest_connections);
+    let mut the_final_pair_pt2: [(i64, i64, i64, usize); 2] = [(0, 0, 0, 0), (0, 0, 0, 0)];
 
-    for shortest_pair_data in shortest_connections {
-        let node_indexes_shortest = shortest_pair_data.1;
+    // part 2 wants a circuit for ALL nodes yep
+    while !full_circuit {
+        shortest_pairs_amount += 1; // keep adding until the circuit is fully made
+        println!("New attempt, connections goal: {}", shortest_pairs_amount);
 
-        let mut added = false;
-        let mut circs_idx_to_remove: Vec<usize> = vec![];
-        let mut values_to_add: HashSet<usize> = HashSet::new();
-        for (circ_idx, circ) in circuits.iter().enumerate() {
-            if circ.contains(&node_indexes_shortest.0) && !circ.contains(&node_indexes_shortest.1) {
-                println!(
-                    "Adding: {:?} -> {:?}",
-                    nodes_vec[node_indexes_shortest.1], circ
-                );
-                all_connections_made.insert([
-                    nodes_vec[node_indexes_shortest.0],
-                    nodes_vec[node_indexes_shortest.1],
-                ]);
-                for val in circ {
-                    values_to_add.insert(*val);
-                }
-                values_to_add.insert(node_indexes_shortest.1);
-                circs_idx_to_remove.push(circ_idx);
-                added = true;
-            } else if circ.contains(&node_indexes_shortest.1)
-                && !circ.contains(&node_indexes_shortest.0)
-            {
-                println!(
-                    "Adding: {:?} -> {:?}",
-                    nodes_vec[node_indexes_shortest.0], circ
-                );
-                all_connections_made.insert([
-                    nodes_vec[node_indexes_shortest.0],
-                    nodes_vec[node_indexes_shortest.1],
-                ]);
-                for val in circ {
-                    values_to_add.insert(*val);
-                }
-                values_to_add.insert(node_indexes_shortest.0);
-                circs_idx_to_remove.push(circ_idx);
-                added = true;
-            } else if circ.contains(&node_indexes_shortest.1)
-                && circ.contains(&node_indexes_shortest.0)
-            {
-                println!(
-                    "Already added, doing nothing: ({:?})",
-                    [
-                        nodes_vec[node_indexes_shortest.0],
-                        nodes_vec[node_indexes_shortest.1]
-                    ]
-                );
-                all_connections_made.insert([
-                    nodes_vec[node_indexes_shortest.0],
-                    nodes_vec[node_indexes_shortest.1],
-                ]);
-                added = true;
-            }
+        circuits.clear();
+        // make all nodes circuits of 1
+        for (i, _) in nodes_vec.iter().enumerate() {
+            circuits.push(vec![i]);
         }
 
-        // add to a new circuit
-        if !added {
-            println!(
-                "Adding: ({:?}, {:?}) -> {:?}",
-                nodes_vec[node_indexes_shortest.0], nodes_vec[node_indexes_shortest.1], circuits
+        let mut shortest_pairs = BinaryHeap::new();
+
+        //println!("Curr count: {}", connection_count);
+        for (i, checking_node) in nodes_vec.iter().enumerate() {
+            find_shortest_distances(
+                &tree.clone(),
+                (checking_node.0, checking_node.1, checking_node.2),
+                i,
+                &mut shortest_pairs,
+                shortest_pairs_amount,
             );
-            all_connections_made.insert([
-                nodes_vec[node_indexes_shortest.0],
-                nodes_vec[node_indexes_shortest.1],
-            ]);
-            circuits.push(vec![node_indexes_shortest.0, node_indexes_shortest.1]);
-        } else if !values_to_add.is_empty() {
-            // rebuild circuit in case 2 of them connect
-
-            // assuming they are in order...
-            let mut removed_amount = 0;
-            for idx_to_remove in circs_idx_to_remove {
-                circuits.remove(idx_to_remove - removed_amount);
-                removed_amount += 1;
-            }
-
-            let mut new_circuit = vec![];
-            for val in values_to_add {
-                new_circuit.push(val);
-            }
-            circuits.push(new_circuit);
         }
-        println!("Current Circuits: {:?}", circuits);
+
+        let shortest_connections = shortest_pairs.clone().into_sorted_vec();
+        //println!();
+        //println!("SHORTESTs: {:?}", shortest_connections);
+
+        for shortest_pair_data in shortest_connections {
+            let node_indexes_shortest = shortest_pair_data.1;
+
+            let mut added = false;
+            let mut circs_idx_to_remove: Vec<usize> = vec![];
+            let mut values_to_add: HashSet<usize> = HashSet::new();
+            for (circ_idx, circ) in circuits.iter().enumerate() {
+                if circ.contains(&node_indexes_shortest.0)
+                    && !circ.contains(&node_indexes_shortest.1)
+                {
+                    // println!(
+                    //     "Adding: {:?} -> {:?}",
+                    //     nodes_vec[node_indexes_shortest.1], circ
+                    // );
+
+                    the_final_pair_pt2 = [
+                        nodes_vec[node_indexes_shortest.0],
+                        nodes_vec[node_indexes_shortest.1],
+                    ];
+
+                    for val in circ {
+                        values_to_add.insert(*val);
+                    }
+                    values_to_add.insert(node_indexes_shortest.1);
+                    circs_idx_to_remove.push(circ_idx);
+                    added = true;
+                } else if circ.contains(&node_indexes_shortest.1)
+                    && !circ.contains(&node_indexes_shortest.0)
+                {
+                    // println!(
+                    //     "Adding: {:?} -> {:?}",
+                    //     nodes_vec[node_indexes_shortest.0], circ
+                    // );
+
+                    the_final_pair_pt2 = [
+                        nodes_vec[node_indexes_shortest.0],
+                        nodes_vec[node_indexes_shortest.1],
+                    ];
+
+                    for val in circ {
+                        values_to_add.insert(*val);
+                    }
+                    values_to_add.insert(node_indexes_shortest.0);
+                    circs_idx_to_remove.push(circ_idx);
+                    added = true;
+                } else if circ.contains(&node_indexes_shortest.1)
+                    && circ.contains(&node_indexes_shortest.0)
+                {
+                    // println!(
+                    //     "Already added, doing nothing: ({:?})",
+                    //     [
+                    //         nodes_vec[node_indexes_shortest.0],
+                    //         nodes_vec[node_indexes_shortest.1]
+                    //     ]
+                    // );
+
+                    added = true;
+                }
+            }
+
+            // add to a new circuit
+            if !added {
+                // println!(
+                //     "Adding: ({:?}, {:?}) -> {:?}",
+                //     nodes_vec[node_indexes_shortest.0],
+                //     nodes_vec[node_indexes_shortest.1],
+                //     circuits
+                // );
+
+                circuits.push(vec![node_indexes_shortest.0, node_indexes_shortest.1]);
+            } else if !values_to_add.is_empty() {
+                // rebuild circuit in case 2 of them connect
+
+                // assuming they are in order...
+                for (removed_amount, idx_to_remove) in circs_idx_to_remove.iter().enumerate() {
+                    circuits.remove(idx_to_remove - removed_amount);
+                }
+
+                the_final_pair_pt2 = [
+                    nodes_vec[node_indexes_shortest.0],
+                    nodes_vec[node_indexes_shortest.1],
+                ];
+
+                let mut new_circuit = vec![];
+                for val in values_to_add {
+                    new_circuit.push(val);
+                }
+                circuits.push(new_circuit);
+            }
+            //println!("Current Circuits: {:?}", circuits);
+        }
+
+        //println!("\nFinal: {:?}", circuits);
+        if circuits.len() == 1 {
+            full_circuit = true;
+            println!("FULL CIRCUIT ACHIEVED!: {:?}", circuits);
+        } else {
+            println!("Failed! curr len: {}", circuits.len());
+        }
     }
 
-    println!("\nFinal: {:?}", circuits);
+    // part 1, doesn't work with pt2 since it's only 1 circuit
+    // let mut final_mult = 1;
+    // circuits.sort_by(|a, b| a.len().cmp(&b.len()));
+    // for i in 1..=3 {
+    //     let value_highest_len = circuits.get(circuits.len() - i).unwrap().len();
+    //     println!("Multing: {}", value_highest_len);
+    //     final_mult *= value_highest_len;
+    // }
+    // println!("Final mult: {}", final_mult);
 
-    let mut final_mult = 1;
-    circuits.sort_by(|a, b| a.len().cmp(&b.len()));
-    for i in 1..=3 {
-        let value_highest_len = circuits.get(circuits.len() - i).unwrap().len();
-        println!("Multing: {}", value_highest_len);
-        final_mult *= value_highest_len;
-    }
-
-    println!("Final mult: {}", final_mult);
+    println!("Final connection was: {:?}", the_final_pair_pt2);
+    println!(
+        "Final X mult: {}",
+        the_final_pair_pt2[0].0 * the_final_pair_pt2[1].0
+    );
 }
 
 fn build_kd_tree(mut nodes_vec: Vec<(i64, i64, i64, usize)>, depth: u32) -> Option<Box<KDNode>> {
@@ -225,8 +258,8 @@ fn find_shortest_distances(
     best_pairs: &mut BinaryHeap<(OrderedFloat<f64>, (usize, usize))>,
     max: usize, // max number of pairs
 ) {
-    match node_opt {
-        Some(node) => {
+    if let Some(node) = node_opt {
+        
             let index_pair = if node.idx_in_vec < idx {
                 (node.idx_in_vec, idx)
             } else {
@@ -238,6 +271,7 @@ fn find_shortest_distances(
                 for pair in best_pairs.iter() {
                     if (pair.1) == index_pair {
                         it_do_be_exist = true;
+                        break;
                     }
                 }
                 it_do_be_exist
@@ -281,9 +315,5 @@ fn find_shortest_distances(
             if ((plane_dist_diff * plane_dist_diff) as f64) < worst_dist {
                 find_shortest_distances(far, goal_point, idx, best_pairs, max);
             }
-
-            return;
-        }
-        None => return,
     }
 }
