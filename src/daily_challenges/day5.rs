@@ -14,7 +14,7 @@ pub fn day5(input_reader: BufReader<File>) {
     let mut section = CurrentSection::Ranges;
     let mut ranges: Vec<(u64, u64)> = vec![];
     let mut final_fresh_value_count = 0;
-    let mut all_ranges_no_dupes:HashSet<(u64, u64)> = HashSet::new();
+    let mut all_ranges_no_dupes: HashSet<(u64, u64)> = HashSet::new();
 
     for line_res in input_reader.lines() {
         let line = match line_res {
